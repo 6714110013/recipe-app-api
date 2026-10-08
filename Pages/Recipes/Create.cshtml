@@ -1,0 +1,81 @@
+﻿@page
+@model RecipeApp.Pages.Recipes.CreateModel
+@{
+    ViewData["Title"] = "Create Recipe";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<form method="post" class="form-horizontal">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <!-- 1. ใช้ for="Input" เพื่อให้ Model Binding ค่า Name และ Method เข้าตัวแปรถูกต้อง -->
+    <partial name="_EditRecipePartial" for="Input" />
+
+    <div class="form-group mt-3">
+        <table class="table table-striped" id="ingredients">
+            <thead>
+                <tr>
+                    <th>Ingredient</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Input.Ingredients.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input asp-for="Input.Ingredients[i].Name" class="form-control" />
+                            <span asp-validation-for="Input.Ingredients[i].Name" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="Input.Ingredients[i].Quantity" class="form-control" />
+                            <span asp-validation-for="Input.Ingredients[i].Quantity" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="Input.Ingredients[i].Unit" class="form-control" />
+                            <span asp-validation-for="Input.Ingredients[i].Unit" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-danger remove">Remove</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-group mt-3">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="button" class="btn btn-success" id="addIngredient">Add ingredient</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        var ingredients = $('#ingredients tbody');
+        $("#addIngredient").click(function () {
+            var rowNo = ingredients.find('tr').length;
+            // 2. เติม Input. นำหน้าใน JavaScript ให้ครบทุกช่อง
+            var template =
+                '<tr>' +
+                '<td><input name="Input.Ingredients[' + rowNo + '].Name" id="Input_Ingredients_' + rowNo + '__Name" class="form-control" /></td>' +
+                '<td><input name="Input.Ingredients[' + rowNo + '].Quantity" id="Input_Ingredients_' + rowNo + '__Quantity" class="form-control" /></td>' +
+                '<td><input name="Input.Ingredients[' + rowNo + '].Unit" id="Input_Ingredients_' + rowNo + '__Unit" class="form-control" /></td>' +
+                '<td><a href="#" class="btn btn-sm btn-outline-danger remove">Remove</a></td>' +
+                '</tr>';
+            ingredients.append(template);
+        });
+
+        ingredients.on('click', '.remove', function (e) {
+            e.preventDefault();
+            $(this).closest('tr').remove();
+        });
+    </script>
+}
