@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using RecipeApp;
 using RecipeApp.Data;
-using System.Configuration;
-using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +16,19 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<RecipeService>();
 
-// ??????????? Authentication ???? Cookie
+// Configure Identity Services
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configure Authentication & Cookie
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/Login"; // ????? path ??????? Login ?????????????????????????
-        options.LogoutPath = "/Logout"; // ????? path ?????? Logout
+        options.LoginPath = "/Login";
+        options.LogoutPath = "/Logout";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
     });
-
-builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -32,13 +36,15 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapRazorPages();
