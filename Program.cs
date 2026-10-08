@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -17,18 +17,19 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<RecipeService>();
 
 // Configure Identity Services
+// Configure Identity Services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// Configure Authentication & Cookie
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Login";
-        options.LogoutPath = "/Logout";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
-    });
+// บังคับเปลี่ยน LoginPath และ AccessDeniedPath ให้ชี้ไปที่หน้า /Login ของเรา
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login";
+    options.LogoutPath = "/Login";
+    options.AccessDeniedPath = "/Login";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+});
 
 var app = builder.Build();
 
