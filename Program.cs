@@ -6,7 +6,6 @@ using Npgsql.EntityFrameworkCore.PostgreSQL;
 using RecipeApp;
 using RecipeApp.Data;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,7 +16,6 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<RecipeService>();
 
-// Configure Identity Services
 // Configure Identity Services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
@@ -33,6 +31,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var app = builder.Build();
+
+// สั่งรัน Database Migration อัตโนมัติเมื่อแอปเริ่มต้นขึ้น
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
